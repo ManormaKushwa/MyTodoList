@@ -1,20 +1,92 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// import { StatusBar } from "expo-status-bar";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+} from "react-native";
 
-export default function App() {
+const App = () => {
+  const sets = ['Buy Bread', 'Buy Milk', 'Buy Eggs'];
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>My Todo List</Text>
+      </View>
+      <ScrollView style={styles.scrollView}>
+        {sets.map((value,i) => {
+          return (
+            <Text style={styles.todo_list} key={i}>{value}</Text>
+          );
+        })}
+      </ScrollView>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.button} >
+          <Text style={styles.buttonLabel}>Add New Todo</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: StatusBar.currentHeight,
+  },
+  scrollView: {
+    margin: 5,
+  },
+  header: {
+    borderBottomColor: "#dadada",
+    borderBottomWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 40,
+    backgroundColor: "#DE9A8B",
+  },
+  footer: {
+    borderTopColor: "#dadada",
+    borderTopWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 60,
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: 20,
+    color:"#fff",
+    fontFamily: "sans-serif"
+  },
+  todo_list:{
+    padding: 10,
+    marginVertical:3,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor:"#f5c5ba",
+    color:"#1D2134",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  button: {
+    padding: 10,
+    borderRadius: 50,
+    backgroundColor: "#rgb(117,149,120)",
+    minWidth: "50%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#FFF",
+    textTransform: "uppercase"
   },
 });
+
+
+
+export default App;
