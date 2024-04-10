@@ -23,13 +23,11 @@ const CreateTodo = () => {
             Alert.alert('Error', 'Please enter all the inputs.');
             return;
         }
-
-        // Create a new todo object
         const newTodo = {
-            id: String(Date.now()), // Generate a unique ID (in a real app, use a proper ID generator)
+            id: String(Date.now()), 
             title: title.trim(),
             description: description.trim(),
-            finished: false // Set initial state as not finished
+            finished: false
         };
 
         try {
@@ -40,7 +38,6 @@ const CreateTodo = () => {
             }
             todos.push(newTodo);
             await AsyncStorage.setItem('todos', JSON.stringify(todos));
-
             Alert.alert('Success', 'Todo Added Successfully.', [
                 { text: 'OK', onPress: () => navigation.goBack() }
             ]);
@@ -79,8 +76,8 @@ const CreateTodo = () => {
             <View style={styles.footer}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <View style={styles.button}>
-                        <Icon name="times" size={20} color="#FFFFFF" />
-                        <Text style={styles.buttonText}>Cancel</Text>
+                        <Icon name="backward" size={20} color="#FFFFFF" />
+                        <Text style={styles.buttonText}>Back</Text>
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={saveTodo}>

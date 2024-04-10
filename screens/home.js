@@ -16,28 +16,40 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Home = () => {
     const navigation = useNavigation();
     const [todos, setTodos] = useState([]);
+    const [localtodos, setlocalTodos] = useState([]);
+    const sets = ["Buy Bread", "Buy Milk", "Buy Eggs"];
 
-    // Function to fetch todos from AsyncStorage
     const fetchTodos = async () => {
         try {
             const storedTodos = await AsyncStorage.getItem('todos');
-            if (storedTodos) {
+            if (JSON.parse(storedTodos).length != 0) {
                 setTodos(JSON.parse(storedTodos).map(todo => ({ ...todo, expanded: false })));
             } else {
-                setTodos([]); // Set todos to an empty array if no todos are found
+                setlocalTodos(
+                    sets.map((title, index) => ({
+                        id: index + 1,
+                        title,
+                        description: '',
+                        expanded: false,
+                        finished: false,
+                        local: true
+                    }))
+                );
             }
         } catch (error) {
-            console.error('Error fetching todos:', error);
             Alert.alert('Error', 'Failed to fetch todos. Please try again.');
         }
     };
 
-    // Use useFocusEffect hook to refetch todos when the screen is focused
     useFocusEffect(
         useCallback(() => {
-            fetchTodos(); // Call fetchTodos when the screen is focused
+            fetchTodos();
         }, [])
     );
+    
+    useEffect(() => {
+        AsyncStorage.setItem('todos', JSON.stringify(todos));
+    }, [todos]);
 
     const handleAddTodo = () => {
         navigation.navigate('Add New Todo');
@@ -51,23 +63,69 @@ const Home = () => {
         );
     };
 
+    const handleFinishTodo = async (todoId) => {
+        setTodos((prevTodos) =>
+            prevTodos.map((todo) =>
+                todo.id === todoId ? { ...todo, finished: true } : todo
+            )
+        );
+    };
+
+    const handleDeleteTodo = async (todoId) => {
+        const updatedTodos = todos.filter((todo) => todo.id !== todoId);
+        setTodos(updatedTodos);
+    };
+
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>My Todo List</Text>
             </View>
             <FlatList
-                data={todos}
+                data={todos.length === 0 ? localtodos : todos }
                 renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.todoContainer}
-                        onPress={() => toggleTodoExpansion(item.id)}
-                    >
-                        <Text style={styles.todoTitle}>{item.title} <Icon name="times" size={20} /></Text>
+                    <TouchableOpacity style={styles.todoContainer} onPress={() => toggleTodoExpansion(item.id)}>
+                        <View style={styles.bodyContainer}>
+                            <Text style={styles.todoTitle}>{item.title}</Text>
+                            {item.expanded ? (
+                                <Icon name="caret-up" size={20} style={styles.icon} />
+                            ) : (
+                                <Icon name="caret-down" size={20} style={styles.icon} />
+                            )}
+                        </View>
                         {item.expanded && (
-                            <View>
+                            <View style={styles.expandedContent}>
                                 <Text style={styles.todoDescription}>{item.description}</Text>
-                                <Icon name="times" size={20} />
+
+                                {item.finished === false ? (
+                                    <View style={styles.controlPanel}>
+                                        <TouchableOpacity
+                                            style={styles.todobutton}
+                                            onPress={() => handleFinishTodo(item.id)}
+                                        >
+                                            <Icon name="check-circle" size={20} color="#DE9A8B" />
+                                            <Text style={styles.todobuttonLabel}>Complete</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={styles.todobutton}
+                                            onPress={() => handleDeleteTodo(item.id)}
+                                        >
+                                            <Icon name="trash-o" size={20} color="#DE9A8B" />
+                                            <Text style={styles.todobuttonLabel}>Delete</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ) : (
+                                    <View style={styles.controlPanel}>
+                                        <TouchableOpacity
+                                            style={styles.todobutton}
+                                            onPress={() => handleDeleteTodo(item.id)}
+                                        >
+                                            <Icon name="trash-o" size={20} color="#DE9A8B" />
+                                            <Text style={styles.todobuttonLabel}>Delete</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
                             </View>
                         )}
                     </TouchableOpacity>
@@ -76,7 +134,10 @@ const Home = () => {
                 contentContainerStyle={styles.scrollView}
             />
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.button} onPress={handleAddTodo}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={handleAddTodo}
+                >
                     <Icon name="plus" size={20} color="#FFFFFF" />
                     <Text style={styles.buttonLabel}>Add New Todo</Text>
                 </TouchableOpacity>
@@ -124,20 +185,10 @@ const styles = StyleSheet.create({
         borderColor: '#f5c5ba',
         backgroundColor: '#fff',
     },
-    todoTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#1D2134',
-    },
-    todoDescription: {
-        fontSize: 14,
-        color: '#777',
-        marginTop: 5,
-    },
     button: {
         padding: 10,
         borderRadius: 50,
-        backgroundColor: '#75-95-78',
+        backgroundColor: '#759578',
         minWidth: '50%',
         justifyContent: 'center',
         alignItems: 'center',
@@ -147,6 +198,48 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         color: '#FFF',
+        textTransform: 'uppercase',
+        marginLeft: 8,
+    },
+    bodyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    todoTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1D2134',
+        flex: 1,
+        marginRight: 8,
+    },
+    icon: {
+        color: 'black', // Optional: Set icon color
+    },
+    todoDescription: {
+        fontSize: 14,
+        color: '#777',
+        flex: 1,
+        marginRight: 8,
+    },
+    controlPanel: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 10,
+    },
+    todobutton: {
+        padding: 7,
+        borderRadius: 50,
+        borderWidth: 1,
+        borderColor: '#DE9A8B',
+        minWidth: '30%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    todobuttonLabel: {
+        fontSize: 10,
+        fontWeight: '500',
+        // color: '#FFF',
         textTransform: 'uppercase',
         marginLeft: 8,
     },
