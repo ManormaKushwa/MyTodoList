@@ -12,6 +12,9 @@ import {
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Title from "../components/Title";
+import TButton from "../components/TButton";
+import ControlButton from "../components/ControlButton";
 
 const Home = () => {
     const navigation = useNavigation();
@@ -28,11 +31,10 @@ const Home = () => {
                 setlocalTodos(
                     sets.map((title, index) => ({
                         id: index + 1,
-                        title,
+                        title: title,
                         description: '',
                         expanded: false,
                         finished: false,
-                        local: true
                     }))
                 );
             }
@@ -46,7 +48,7 @@ const Home = () => {
             fetchTodos();
         }, [])
     );
-    
+
     useEffect(() => {
         AsyncStorage.setItem('todos', JSON.stringify(todos));
     }, [todos]);
@@ -76,14 +78,11 @@ const Home = () => {
         setTodos(updatedTodos);
     };
 
-
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>My Todo List</Text>
-            </View>
+            <Title>My Todo List</Title>
             <FlatList
-                data={todos.length === 0 ? localtodos : todos }
+                data={todos.length === 0 ? localtodos : todos}
                 renderItem={({ item }) => (
                     <TouchableOpacity style={styles.todoContainer} onPress={() => toggleTodoExpansion(item.id)}>
                         <View style={styles.bodyContainer}>
@@ -97,33 +96,14 @@ const Home = () => {
                         {item.expanded && (
                             <View style={styles.expandedContent}>
                                 <Text style={styles.todoDescription}>{item.description}</Text>
-
                                 {item.finished === false ? (
                                     <View style={styles.controlPanel}>
-                                        <TouchableOpacity
-                                            style={styles.todobutton}
-                                            onPress={() => handleFinishTodo(item.id)}
-                                        >
-                                            <Icon name="check-circle" size={20} color="#DE9A8B" />
-                                            <Text style={styles.todobuttonLabel}>Complete</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.todobutton}
-                                            onPress={() => handleDeleteTodo(item.id)}
-                                        >
-                                            <Icon name="trash-o" size={20} color="#DE9A8B" />
-                                            <Text style={styles.todobuttonLabel}>Delete</Text>
-                                        </TouchableOpacity>
+                                        <ControlButton onPress={() => handleFinishTodo(item.id)} icon={'check-circle'}>Complete</ControlButton>
+                                        <ControlButton onPress={() => handleDeleteTodo(item.id)} icon={'trash-o'}>Delete</ControlButton>
                                     </View>
                                 ) : (
                                     <View style={styles.controlPanel}>
-                                        <TouchableOpacity
-                                            style={styles.todobutton}
-                                            onPress={() => handleDeleteTodo(item.id)}
-                                        >
-                                            <Icon name="trash-o" size={20} color="#DE9A8B" />
-                                            <Text style={styles.todobuttonLabel}>Delete</Text>
-                                        </TouchableOpacity>
+                                        <ControlButton onPress={() => handleDeleteTodo(item.id)} icon={'trash-o'}>Delete</ControlButton>
                                     </View>
                                 )}
                             </View>
@@ -134,13 +114,7 @@ const Home = () => {
                 contentContainerStyle={styles.scrollView}
             />
             <View style={styles.footer}>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={handleAddTodo}
-                >
-                    <Icon name="plus" size={20} color="#FFFFFF" />
-                    <Text style={styles.buttonLabel}>Add New Todo</Text>
-                </TouchableOpacity>
+                <TButton onPress={handleAddTodo} icon={'plus'}>Add New Todo</TButton>
             </View>
         </SafeAreaView>
     );
@@ -155,14 +129,7 @@ const styles = StyleSheet.create({
     scrollView: {
         margin: 5,
     },
-    header: {
-        borderBottomColor: '#dadada',
-        borderBottomWidth: 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 40,
-        backgroundColor: '#DE9A8B',
-    },
+
     footer: {
         borderTopColor: '#dadada',
         borderTopWidth: 2,
@@ -171,12 +138,7 @@ const styles = StyleSheet.create({
         height: 60,
         backgroundColor: '#fff',
     },
-    title: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        color: '#fff',
-        fontFamily: 'sans-serif',
-    },
+
     todoContainer: {
         padding: 10,
         marginVertical: 3,
@@ -184,22 +146,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#f5c5ba',
         backgroundColor: '#fff',
-    },
-    button: {
-        padding: 10,
-        borderRadius: 50,
-        backgroundColor: '#759578',
-        minWidth: '50%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-    },
-    buttonLabel: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#FFF',
-        textTransform: 'uppercase',
-        marginLeft: 8,
     },
     bodyContainer: {
         flexDirection: 'row',
@@ -212,9 +158,6 @@ const styles = StyleSheet.create({
         flex: 1,
         marginRight: 8,
     },
-    icon: {
-        color: 'black', // Optional: Set icon color
-    },
     todoDescription: {
         fontSize: 14,
         color: '#777',
@@ -225,23 +168,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         marginTop: 10,
-    },
-    todobutton: {
-        padding: 7,
-        borderRadius: 50,
-        borderWidth: 1,
-        borderColor: '#DE9A8B',
-        minWidth: '30%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-    },
-    todobuttonLabel: {
-        fontSize: 10,
-        fontWeight: '500',
-        // color: '#FFF',
-        textTransform: 'uppercase',
-        marginLeft: 8,
     },
 });
 

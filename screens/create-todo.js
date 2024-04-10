@@ -12,6 +12,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import TButton from "../components/TButton";
 
 const CreateTodo = () => {
     const navigation = useNavigation();
@@ -49,15 +50,13 @@ const CreateTodo = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* <View style={styles.header}>
-                <Text style={styles.title}>Add New Todo</Text>
-            </View> */}
             <View style={styles.body}>
                 <View>
                     <Text style={styles.label}>Title:</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Enter title"
+                        placeholderTextColor="#DE9A8B"
                         value={title}
                         onChangeText={setTitle}
                     />
@@ -67,6 +66,7 @@ const CreateTodo = () => {
                     <TextInput
                         style={[styles.input, styles.multilineInput]}
                         placeholder="Enter description"
+                        placeholderTextColor="#DE9A8B"
                         multiline
                         value={description}
                         onChangeText={setDescription}
@@ -74,18 +74,8 @@ const CreateTodo = () => {
                 </View>
             </View>
             <View style={styles.footer}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <View style={styles.button}>
-                        <Icon name="backward" size={20} color="#FFFFFF" />
-                        <Text style={styles.buttonText}>Back</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={saveTodo}>
-                    <View style={styles.button}>
-                        <Icon name="save" size={14} color="#FFFFFF" />
-                        <Text style={styles.buttonText}>Save</Text>
-                    </View>
-                </TouchableOpacity>
+                <TButton onPress={() => navigation.goBack()} icon={'backward'}>Back</TButton>
+                <TButton  onPress={saveTodo} icon={'save'}>Save</TButton>
             </View>
         </SafeAreaView>
     );
@@ -136,10 +126,11 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 18,
         marginBottom: 5,
+        fontWeight:'700',
     },
     input: {
         borderBottomWidth: 1,
-        borderColor: '#CCCCCC',
+        borderColor: '#DE9A8B',
         marginBottom: 20,
         paddingHorizontal: 10,
         paddingVertical: 8,
